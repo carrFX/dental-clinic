@@ -188,8 +188,15 @@ export function NotificationDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[min(100vw-2rem,22rem)] origin-top-right animate-fade-in-down rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-xl">
-          <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-black/25 md:hidden"
+            aria-label={t("common.close")}
+            onClick={() => setOpen(false)}
+          />
+          <div className="fixed left-3 right-3 top-[4.25rem] z-50 flex max-h-[min(70vh,24rem)] flex-col animate-fade-in-down overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-xl md:absolute md:left-auto md:right-0 md:top-full md:mt-2 md:w-[22rem] md:max-w-[min(100vw-2rem,22rem)] md:max-h-80 md:origin-top-right">
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <h3 className="text-sm font-semibold text-[var(--foreground)]">
               {t("common.notifications")}
             </h3>
@@ -204,7 +211,7 @@ export function NotificationDropdown() {
             )}
           </div>
 
-          <ul className="max-h-80 overflow-y-auto overscroll-contain py-1">
+          <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-1">
             {notifications.length === 0 ? (
               <li className="flex flex-col items-center gap-2 px-4 py-8 text-center">
                 <CheckCircle2 className="h-10 w-10 text-[var(--success)]" />
@@ -248,7 +255,7 @@ export function NotificationDropdown() {
             )}
           </ul>
 
-          <div className="border-t border-[var(--border)] p-2">
+          <div className="shrink-0 border-t border-[var(--border)] p-2">
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
@@ -258,6 +265,7 @@ export function NotificationDropdown() {
             </Link>
           </div>
         </div>
+        </>
       )}
     </div>
   );
