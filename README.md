@@ -197,8 +197,7 @@ dental-clinic/
 ├── components/
 │   ├── landing/            # Hero, About, Services, ...
 │   ├── dashboard/          # Sidebar, charts, CRUD table, modal
-│   ├── providers/          # AppProviders
-│   └── seo/                # JsonLd, SkipToContent
+│   └── providers/          # AppProviders
 ├── contexts/               # Auth, Data, Theme, Locale, Toast, Confirm
 ├── data/
 │   └── initial-data.json   # Mock data default
