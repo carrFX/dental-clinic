@@ -17,7 +17,7 @@ import {
   canViewFinance,
   canViewInventory,
 } from "@/lib/sidebar-access";
-import { appointmentStatusKey } from "@/lib/i18n/status-label";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { formatCurrency } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -43,7 +43,7 @@ export default function DashboardPage() {
       title={t("dashboard.title")}
       subtitle={t("dashboard.subtitle")}
     >
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-4 sm:space-y-6">
         <div
           className={`grid gap-4 sm:grid-cols-2 ${
             showFinance && showInventory
@@ -92,10 +92,12 @@ export default function DashboardPage() {
 
         <DashboardChartsLazy />
 
-        <div className="rounded-2xl surface-card p-5 shadow-sm ring-1 ring-[var(--border)]">
-          <h3 className="mb-4 font-semibold">{t("dashboard.recentAppointments")}</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px] text-sm">
+        <div className="min-w-0 rounded-2xl surface-card p-4 shadow-sm ring-1 ring-[var(--border)] sm:p-5">
+          <h3 className="mb-3 text-base font-semibold sm:mb-4 sm:text-lg">
+            {t("dashboard.recentAppointments")}
+          </h3>
+          <div className="-mx-1 overflow-x-auto px-1">
+            <table className="w-full min-w-[480px] text-sm sm:min-w-[520px]">
               <thead>
                 <tr className="border-b border-[var(--border)] text-left text-[var(--muted)]">
                   <th className="pb-2 pr-4">{t("dashboard.col.patient")}</th>
@@ -113,19 +115,7 @@ export default function DashboardPage() {
                       {a.date} {a.time}
                     </td>
                     <td className="py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          a.status === "Selesai"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                            : a.status === "Diproses"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                              : a.status === "Dibatalkan"
-                                ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                                : "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
-                        }`}
-                      >
-                        {t(appointmentStatusKey(a.status))}
-                      </span>
+                      <StatusBadge status={a.status} type="appointment" />
                     </td>
                   </tr>
                 ))}

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { useLocale } from "@/contexts/LocaleContext";
+import { TablePagination } from "./TablePagination";
 
 export interface Column<T> {
   key: keyof T | string;
@@ -17,6 +19,8 @@ interface CrudTableProps<T extends { id: string }> {
   onEdit: (item: T) => void;
   onDelete: (item: T) => void;
   emptyMessage?: string;
+  /** Jumlah baris per halaman; default 8. Set 0 untuk menonaktifkan pagination. */
+  pageSize?: number;
 }
 
 export function CrudTable<T extends { id: string }>({
@@ -27,12 +31,26 @@ export function CrudTable<T extends { id: string }>({
   onEdit,
   onDelete,
   emptyMessage,
+  pageSize = 8,
 }: CrudTableProps<T>) {
   const { t } = useLocale();
   const empty = emptyMessage ?? t("common.empty");
+  const [page, setPage] = useState(1);
+
+  const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(data.length / pageSize)) : 1;
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages));
+  }, [data.length, totalPages]);
+
+  const paginatedData = useMemo(() => {
+    if (pageSize <= 0) return data;
+    const start = (page - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }, [data, page, pageSize]);
 
   return (
-    <div className="rounded-2xl surface-card shadow-sm ring-1 ring-[var(--border)]">
+    <div className="min-w-0 rounded-2xl surface-card shadow-sm ring-1 ring-[var(--border)]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] p-4 sm:p-5">
         <h2 className="text-lg font-semibold text-[var(--foreground)]">{title}</h2>
         <button
@@ -73,7 +91,7 @@ export function CrudTable<T extends { id: string }>({
                 </td>
               </tr>
             ) : (
-              data.map((item) => (
+              paginatedData.map((item) => (
                 <tr
                   key={item.id}
                   className="border-b border-[var(--border)]/50 transition hover:bg-[var(--accent)]/30"
@@ -113,6 +131,16 @@ export function CrudTable<T extends { id: string }>({
           </tbody>
         </table>
       </div>
+
+      {pageSize > 0 && data.length > 0 && (
+        <TablePagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={data.length}
+          pageSize={pageSize}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

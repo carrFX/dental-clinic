@@ -94,7 +94,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="shrink-0 border-b border-[var(--border)] px-4 py-4">
           <div className="relative flex items-center justify-between">
             <Link
-              href="/dashboard"
+              href="/"
               onClick={onClose}
               className="flex items-center gap-3 group"
             >

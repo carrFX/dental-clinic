@@ -42,11 +42,11 @@ export function Team() {
           </h2>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-sm gap-8 sm:max-w-none sm:grid-cols-2 lg:grid-cols-3">
           {teamMembers.map((member) => (
             <article
               key={member.name}
-              className="group overflow-hidden rounded-2xl bg-[var(--accent)] shadow-sm hover-lift"
+              className="group mx-auto w-full max-w-xs overflow-hidden rounded-2xl bg-[var(--accent)] shadow-sm hover-lift sm:max-w-none"
             >
               <div className="relative aspect-[4/5] overflow-hidden bg-[var(--accent)]">
                 <Image

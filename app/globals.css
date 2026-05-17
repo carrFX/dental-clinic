@@ -80,6 +80,19 @@ body {
   border: 1px solid var(--border);
 }
 
+/* Chart.js — cegah overflow di grid/flex */
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chart-canvas-wrap canvas {
+  display: block;
+  max-width: 100% !important;
+}
+
 .surface-muted {
   background: var(--accent);
 }
@@ -212,28 +225,25 @@ body {
   transition: all 0.2s ease;
 }
 
+/* Panah hanya di layar md+ (horizontal flow) */
 .flow-arrow {
   position: relative;
 }
 
 .flow-arrow::after {
-  content: "→";
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--primary);
-  font-size: 1.25rem;
+  display: none;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .flow-arrow::after {
-    content: "↓";
-    right: auto;
-    top: auto;
-    bottom: -24px;
-    left: 50%;
-    transform: translateX(-50%);
+    display: block;
+    content: "→";
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    font-size: 1.25rem;
   }
 }
 

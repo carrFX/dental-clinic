@@ -15,21 +15,21 @@ export function About() {
   ];
 
   return (
-    <section id="tentang" className="py-20 bg-[var(--card)]">
+    <section id="tentang" className="bg-[var(--card)] py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div className="relative">
-            <div className="relative aspect-square max-w-md overflow-hidden rounded-3xl shadow-xl">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+          <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-5 lg:mx-0 lg:block lg:max-w-none">
+            <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-3xl shadow-xl sm:max-w-md">
               <Image
                 src={images.aboutTeam}
                 alt="Arcade Dental team"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 400px"
+                sizes="(max-width: 768px) 90vw, 400px"
                 loading="lazy"
               />
             </div>
-            <div className="absolute -bottom-6 -right-6 hidden h-48 w-48 overflow-hidden rounded-2xl border-4 border-[var(--card)] shadow-lg sm:block">
+            <div className="relative aspect-[4/3] w-48 overflow-hidden rounded-2xl border-4 border-[var(--card)] shadow-lg sm:w-56 lg:absolute lg:-bottom-6 lg:-right-6 lg:w-48">
               <Image
                 src={images.dentalClinic}
                 alt="Modern dental equipment"
@@ -41,24 +41,26 @@ export function About() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 text-center lg:text-left">
             <span className="text-sm font-semibold uppercase tracking-wider text-[var(--primary)]">
               {t("landing.about.label")}
             </span>
             <h2 className="text-3xl font-bold text-[var(--foreground)] sm:text-4xl">
               {t("landing.about.title")}
             </h2>
-            <p className="text-[var(--muted)] leading-relaxed">{t("landing.about.p1")}</p>
-            <p className="text-[var(--muted)] leading-relaxed">{t("landing.about.p2")}</p>
-            <div className="grid grid-cols-3 gap-4 pt-4">
+            <p className="leading-relaxed text-[var(--muted)]">{t("landing.about.p1")}</p>
+            <p className="leading-relaxed text-[var(--muted)]">{t("landing.about.p2")}</p>
+            <div className="grid grid-cols-3 gap-3 pt-2 sm:gap-4 sm:pt-4">
               {stats.map(({ icon: Icon, value, labelKey }) => (
                 <div
                   key={labelKey}
-                  className="rounded-2xl bg-[var(--accent)] p-4 text-center hover-lift"
+                  className="rounded-2xl bg-[var(--accent)] p-3 text-center hover-lift sm:p-4"
                 >
                   <Icon className="mx-auto mb-2 h-6 w-6 text-[var(--primary)]" />
-                  <p className="text-xl font-bold text-[var(--primary-dark)]">{value}</p>
-                  <p className="text-xs text-[var(--muted)]">{t(labelKey)}</p>
+                  <p className="text-lg font-bold text-[var(--primary-dark)] sm:text-xl">
+                    {value}
+                  </p>
+                  <p className="text-[10px] text-[var(--muted)] sm:text-xs">{t(labelKey)}</p>
                 </div>
               ))}
             </div>

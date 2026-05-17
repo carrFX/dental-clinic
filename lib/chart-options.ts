@@ -1,6 +1,48 @@
 import type { ChartOptions, TooltipItem } from "chart.js";
-import { formatCurrencyDecimal } from "@/lib/utils";
+import { formatCurrencyCompact, formatCurrencyDecimal } from "@/lib/utils";
 import { defaultChartOptions } from "@/components/dashboard/charts/chart-setup";
+
+function tickFont(compact: boolean) {
+  return { size: compact ? 10 : 12 };
+}
+
+function chartLayout(compact: boolean) {
+  return {
+    padding: compact
+      ? { left: 2, right: 6, top: 4, bottom: 2 }
+      : { left: 4, right: 12, top: 8, bottom: 4 },
+  };
+}
+
+function legendOptions(compact: boolean, position: "top" | "bottom" | "right" = "top") {
+  return {
+    position: compact ? ("bottom" as const) : position,
+    align: "start" as const,
+    labels: {
+      font: { family: "system-ui", size: compact ? 11 : 12 },
+      padding: compact ? 10 : 16,
+      boxWidth: compact ? 12 : 16,
+    },
+  };
+}
+
+/** Legend di kanan lingkaran donut/pie — satu kolom vertikal */
+function pieLegendOptions(compact: boolean) {
+  return {
+    position: "right" as const,
+    align: "start" as const,
+    fullSize: false,
+    labels: {
+      font: {
+        family: "system-ui",
+        size: compact ? 13 : 14,
+        weight: "bold" as const,
+      },
+      padding: compact ? 10 : 12,
+      boxWidth: compact ? 14 : 16,
+    },
+  };
+}
 
 function tooltipTitle<T extends "bar" | "line" | "doughnut" | "pie">(
   items: TooltipItem<T>[]
@@ -20,7 +62,15 @@ export function currencyTooltipCallbacks(isHorizontal = false) {
   };
 }
 
-function countLabel(ctx: TooltipItem<"line" | "bar">, unit: string) {
+function countLabelLine(ctx: TooltipItem<"line">, unit: string) {
+  const label = ctx.dataset.label ? `${ctx.dataset.label}: ` : "";
+  const y = ctx.parsed.y;
+  const value = typeof y === "number" ? y : 0;
+  const suffix = unit ? ` ${unit}` : "";
+  return `${label}${value}${suffix}`;
+}
+
+function countLabelBar(ctx: TooltipItem<"bar">, unit: string) {
   const label = ctx.dataset.label ? `${ctx.dataset.label}: ` : "";
   const y = ctx.parsed.y;
   const value = typeof y === "number" ? y : 0;
@@ -31,19 +81,19 @@ function countLabel(ctx: TooltipItem<"line" | "bar">, unit: string) {
 export function lineCountTooltipCallbacks(unit = "") {
   return {
     title: (items: TooltipItem<"line">[]) => tooltipTitle(items),
-    label: (ctx: TooltipItem<"line">) => countLabel(ctx, unit),
+    label: (ctx: TooltipItem<"line">) => countLabelLine(ctx, unit),
   };
 }
 
 export function barCountTooltipCallbacks(unit = "") {
   return {
     title: (items: TooltipItem<"bar">[]) => tooltipTitle(items),
-    label: (ctx: TooltipItem<"bar">) => countLabel(ctx, unit),
+    label: (ctx: TooltipItem<"bar">) => countLabelBar(ctx, unit),
   };
 }
 
-function pieLabel(
-  ctx: TooltipItem<"pie" | "doughnut">,
+function pieLabelText(
+  ctx: TooltipItem<"pie"> | TooltipItem<"doughnut">,
   formatValue?: (n: number) => string
 ) {
   const data = ctx.dataset.data as number[];
@@ -57,14 +107,14 @@ function pieLabel(
 export function doughnutTooltipCallbacks(formatValue?: (n: number) => string) {
   return {
     title: (items: TooltipItem<"doughnut">[]) => tooltipTitle(items),
-    label: (ctx: TooltipItem<"doughnut">) => pieLabel(ctx, formatValue),
+    label: (ctx: TooltipItem<"doughnut">) => pieLabelText(ctx, formatValue),
   };
 }
 
 export function pieTooltipCallbacks(formatValue?: (n: number) => string) {
   return {
     title: (items: TooltipItem<"pie">[]) => tooltipTitle(items),
-    label: (ctx: TooltipItem<"pie">) => pieLabel(ctx, formatValue),
+    label: (ctx: TooltipItem<"pie">) => pieLabelText(ctx, formatValue),
   };
 }
 
@@ -76,35 +126,69 @@ const tooltipBase = {
   cornerRadius: 8,
 };
 
-export function currencyYAxisTicks() {
+export function currencyYAxisTicks(compact = false) {
   return {
     beginAtZero: true,
     ticks: {
-      callback: (value: string | number) => formatCurrencyDecimal(Number(value)),
+      maxTicksLimit: compact ? 5 : 8,
+      font: tickFont(compact),
+      callback: (value: string | number) =>
+        compact
+          ? formatCurrencyCompact(Number(value))
+          : formatCurrencyDecimal(Number(value)),
     },
   };
 }
 
-export function lineChartOptions(): ChartOptions<"line"> {
+export function lineChartOptions(compact = false): ChartOptions<"line"> {
   return {
     ...defaultChartOptions,
+    layout: chartLayout(compact),
     scales: {
-      y: { beginAtZero: true, ticks: { stepSize: 1 } },
+      x: {
+        ticks: {
+          font: tickFont(compact),
+          maxRotation: compact ? 45 : 0,
+          minRotation: compact ? 0 : 0,
+        },
+        grid: { display: !compact },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { stepSize: 1, font: tickFont(compact), maxTicksLimit: compact ? 5 : 8 },
+      },
     },
     plugins: {
-      legend: defaultChartOptions.plugins?.legend,
+      legend: legendOptions(compact, "top"),
       tooltip: {
         ...tooltipBase,
         callbacks: lineCountTooltipCallbacks("pasien"),
       },
     },
+    elements: {
+      point: { radius: compact ? 3 : 5, hoverRadius: compact ? 5 : 7 },
+      line: { borderWidth: compact ? 2 : 2.5 },
+    },
   };
 }
 
-export function barCurrencyOptions(): ChartOptions<"bar"> {
+export function barCurrencyOptions(compact = false): ChartOptions<"bar"> {
   return {
     ...defaultChartOptions,
-    scales: { y: currencyYAxisTicks() },
+    layout: chartLayout(compact),
+    scales: {
+      x: {
+        ticks: {
+          font: tickFont(compact),
+          maxRotation: compact ? 45 : 0,
+          minRotation: compact ? 45 : 0,
+          autoSkip: true,
+          maxTicksLimit: compact ? 6 : 12,
+        },
+        grid: { display: false },
+      },
+      y: currencyYAxisTicks(compact),
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -122,13 +206,20 @@ export function barCurrencyOptions(): ChartOptions<"bar"> {
   };
 }
 
-export function barHorizontalCurrencyOptions(): ChartOptions<"bar"> {
+export function barHorizontalCurrencyOptions(compact = false): ChartOptions<"bar"> {
   return {
     ...defaultChartOptions,
+    layout: chartLayout(compact),
     indexAxis: "y",
-    scales: { x: currencyYAxisTicks() },
+    scales: {
+      y: {
+        ticks: { font: tickFont(compact), autoSkip: false },
+        grid: { display: false },
+      },
+      x: currencyYAxisTicks(compact),
+    },
     plugins: {
-      legend: defaultChartOptions.plugins?.legend,
+      legend: { display: false },
       tooltip: {
         ...tooltipBase,
         callbacks: currencyTooltipCallbacks(true),
@@ -137,12 +228,22 @@ export function barHorizontalCurrencyOptions(): ChartOptions<"bar"> {
   };
 }
 
-export function barCountOptions(): ChartOptions<"bar"> {
+export function barCountOptions(compact = false): ChartOptions<"bar"> {
   return {
     ...defaultChartOptions,
-    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+    layout: chartLayout(compact),
+    scales: {
+      x: {
+        ticks: { font: tickFont(compact) },
+        grid: { display: false },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { stepSize: 1, font: tickFont(compact), maxTicksLimit: compact ? 5 : 8 },
+      },
+    },
     plugins: {
-      legend: defaultChartOptions.plugins?.legend,
+      legend: { display: false },
       tooltip: {
         ...tooltipBase,
         callbacks: barCountTooltipCallbacks("pasien"),
@@ -151,12 +252,16 @@ export function barCountOptions(): ChartOptions<"bar"> {
   };
 }
 
-export function doughnutOptions(formatValue?: (n: number) => string): ChartOptions<"doughnut"> {
+export function doughnutOptions(
+  formatValue?: (n: number) => string,
+  compact = false
+): ChartOptions<"doughnut"> {
   return {
     ...defaultChartOptions,
-    cutout: "65%",
+    layout: chartLayout(compact),
+    cutout: compact ? "72%" : "78%",
     plugins: {
-      legend: defaultChartOptions.plugins?.legend,
+      legend: pieLegendOptions(compact),
       tooltip: {
         ...tooltipBase,
         callbacks: doughnutTooltipCallbacks(formatValue),
@@ -165,15 +270,26 @@ export function doughnutOptions(formatValue?: (n: number) => string): ChartOptio
   };
 }
 
-export function pieChartOptions(formatValue?: (n: number) => string): ChartOptions<"pie"> {
+export function pieChartOptions(
+  formatValue?: (n: number) => string,
+  compact = false
+): ChartOptions<"pie"> {
   return {
     ...defaultChartOptions,
+    layout: chartLayout(compact),
     plugins: {
-      legend: defaultChartOptions.plugins?.legend,
+      legend: pieLegendOptions(compact),
       tooltip: {
         ...tooltipBase,
         callbacks: pieTooltipCallbacks(formatValue),
       },
     },
   };
+}
+
+/** Opsi dataset bar untuk layar sempit */
+export function barDatasetLayout(compact: boolean) {
+  return compact
+    ? { maxBarThickness: 22, barPercentage: 0.65, categoryPercentage: 0.8 }
+    : { maxBarThickness: 48, barPercentage: 0.75, categoryPercentage: 0.85 };
 }

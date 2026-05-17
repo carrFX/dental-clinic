@@ -272,4 +272,8 @@ export type TranslationKey =
   | "form.method"
   | "form.priceRp"
   | "form.totalRp"
-  | "form.paidRp";
+  | "form.paidRp"
+  | "pagination.prev"
+  | "pagination.next"
+  | "pagination.showing"
+  | "pagination.page";

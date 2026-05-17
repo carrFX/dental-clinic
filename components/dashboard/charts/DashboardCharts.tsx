@@ -4,9 +4,12 @@ import { useMemo } from "react";
 import { Line, Bar, Doughnut, Pie } from "react-chartjs-2";
 import "./chart-setup";
 import { chartColors } from "./chart-setup";
+import { ChartCard } from "./ChartCard";
+import { ChartContainer } from "./ChartContainer";
 import { useAuth } from "@/contexts/AuthContext";
 import { useData } from "@/contexts/DataContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { canViewRevenueCharts } from "@/lib/sidebar-access";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -20,6 +23,7 @@ import {
   barCurrencyOptions,
   doughnutOptions,
   pieChartOptions,
+  barDatasetLayout,
 } from "@/lib/chart-options";
 
 const barColors = [
@@ -37,7 +41,10 @@ export function DashboardCharts() {
   const { data } = useData();
   const { user } = useAuth();
   const { t } = useLocale();
+  const { compact, ready } = useBreakpoint();
   const showRevenue = user ? canViewRevenueCharts(user.role) : false;
+
+  const barLayout = barDatasetLayout(compact);
 
   const patientGrowth = useMemo(() => {
     const { labels, data: counts } = aggregateNewPatientsByMonth(data.patients);
@@ -51,12 +58,12 @@ export function DashboardCharts() {
           backgroundColor: `${chartColors.primary}40`,
           fill: true,
           tension: 0.35,
-          pointRadius: 5,
-          pointHoverRadius: 7,
+          pointRadius: compact ? 3 : 5,
+          pointHoverRadius: compact ? 5 : 7,
         },
       ],
     };
-  }, [data.patients, t]);
+  }, [data.patients, t, compact]);
 
   const revenueAgg = useMemo(
     () => aggregateRevenueByMonth(data.invoices),
@@ -73,12 +80,13 @@ export function DashboardCharts() {
           backgroundColor: revenueAgg.labels.map(
             (_, i) => barColors[i % barColors.length]
           ),
-          borderRadius: 8,
+          borderRadius: compact ? 6 : 8,
           borderSkipped: false,
+          ...barLayout,
         },
       ],
     }),
-    [revenueAgg, t]
+    [revenueAgg, t, compact, barLayout]
   );
 
   const appointmentStatus = useMemo(() => {
@@ -96,11 +104,11 @@ export function DashboardCharts() {
             chartColors.danger,
           ],
           borderWidth: 0,
-          hoverOffset: 8,
+          hoverOffset: compact ? 6 : 8,
         },
       ],
     };
-  }, [data.appointments, t]);
+  }, [data.appointments, t, compact]);
 
   const treatmentDist = useMemo(() => {
     const { labels, data: counts } = aggregateTreatmentCategories(data);
@@ -112,76 +120,86 @@ export function DashboardCharts() {
           data: counts,
           backgroundColor: barColors.slice(0, labels.length),
           borderWidth: 0,
-          hoverOffset: 8,
+          hoverOffset: compact ? 6 : 8,
         },
       ],
     };
-  }, [data, t]);
+  }, [data, t, compact]);
 
   const totalRevenue = data.invoices.reduce((s, i) => s + i.paid, 0);
 
+  if (!ready) {
+    return (
+      <div className="grid min-h-[280px] place-items-center rounded-2xl surface-card ring-1 ring-[var(--border)]">
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]"
+          aria-hidden
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className={`grid gap-6 ${showRevenue ? "lg:grid-cols-2" : ""}`}>
-        <div className="rounded-2xl surface-card p-5 shadow-sm ring-1 ring-[var(--border)]">
-          <h3 className="mb-4 font-semibold text-[var(--foreground)]">
-            {t("chart.patientGrowth")}
-          </h3>
-          <div className="h-64">
-            <Line data={patientGrowth} options={lineChartOptions()} />
-          </div>
-        </div>
+    <div className="space-y-4 sm:space-y-6">
+      <div
+        className={`grid grid-cols-1 gap-4 min-w-0 sm:gap-6 ${showRevenue ? "lg:grid-cols-2" : ""}`}
+      >
+        <ChartCard title={t("chart.patientGrowth")}>
+          <ChartContainer size="md">
+            <Line data={patientGrowth} options={lineChartOptions(compact)} />
+          </ChartContainer>
+        </ChartCard>
 
         {showRevenue && (
-        <div className="rounded-2xl surface-card p-5 shadow-sm ring-1 ring-[var(--border)]">
-          <h3 className="mb-1 font-semibold text-[var(--foreground)]">
-            {t("chart.monthlyRevenue")}
-          </h3>
-          <p className="mb-3 text-xs text-[var(--muted)]">
-            {t("chart.totalCollected")}: {formatCurrency(totalRevenue)}
-          </p>
-          <div className="h-56">
-            <Bar data={revenueData} options={barCurrencyOptions()} />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 border-t border-[var(--border)] pt-3">
-            {revenueAgg.labels.map((month, i) => (
-              <span
-                key={month}
-                className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)]"
-              >
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                  style={{ backgroundColor: barColors[i % barColors.length] }}
-                />
-                {month}
-              </span>
-            ))}
-          </div>
-        </div>
+          <ChartCard
+            title={t("chart.monthlyRevenue")}
+            subtitle={
+              <p className="mt-1 text-xs text-[var(--muted)] sm:text-sm">
+                {t("chart.totalCollected")}: {formatCurrency(totalRevenue)}
+              </p>
+            }
+            footer={
+              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-3 sm:flex sm:flex-wrap sm:gap-x-3 sm:gap-y-2">
+                {revenueAgg.labels.map((month, i) => (
+                  <span
+                    key={month}
+                    className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)]"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                      style={{ backgroundColor: barColors[i % barColors.length] }}
+                    />
+                    {month}
+                  </span>
+                ))}
+              </div>
+            }
+          >
+            <ChartContainer size="sm">
+              <Bar data={revenueData} options={barCurrencyOptions(compact)} />
+            </ChartContainer>
+          </ChartCard>
         )}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl surface-card p-5 shadow-sm ring-1 ring-[var(--border)]">
-          <h3 className="mb-4 font-semibold text-[var(--foreground)]">
-            {t("chart.appointmentStatus")}
-          </h3>
-          <div className="mx-auto h-64 max-w-xs">
+      <div className="grid grid-cols-1 gap-4 min-w-0 sm:gap-6 md:grid-cols-2">
+        <ChartCard title={t("chart.appointmentStatus")} className="!p-3 sm:!p-4">
+          <ChartContainer size="pie">
             <Doughnut
               data={appointmentStatus}
-              options={doughnutOptions((v) => `${v}`)}
+              options={doughnutOptions((v) => `${v}`, compact)}
             />
-          </div>
-        </div>
+          </ChartContainer>
+        </ChartCard>
 
-        <div className="rounded-2xl surface-card p-5 shadow-sm ring-1 ring-[var(--border)]">
-          <h3 className="mb-4 font-semibold text-[var(--foreground)]">
-            {t("chart.treatmentCategory")}
-          </h3>
-          <div className="mx-auto h-64 max-w-xs">
-            <Pie data={treatmentDist} options={pieChartOptions((v) => `${v}`)} />
-          </div>
-        </div>
+        <ChartCard title={t("chart.treatmentCategory")} className="!p-3 sm:!p-4">
+          <ChartContainer size="pie">
+            <Pie
+              data={treatmentDist}
+              options={pieChartOptions((v) => `${v}`, compact)}
+            />
+          </ChartContainer>
+        </ChartCard>
       </div>
     </div>
   );

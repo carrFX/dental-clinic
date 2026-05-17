@@ -52,40 +52,43 @@ export function PatientFlowchart() {
   const { t } = useLocale();
 
   return (
-    <div className="rounded-2xl surface-card p-6 shadow-sm ring-1 ring-[var(--border)]">
-      <h3 className="mb-2 font-semibold text-[var(--foreground)]">{t("flow.title")}</h3>
-      <p className="mb-6 text-sm text-[var(--muted)]">{t("flow.subtitle")}</p>
+    <div className="min-w-0 rounded-2xl surface-card p-4 shadow-sm ring-1 ring-[var(--border)] sm:p-6">
+      <h3 className="mb-2 text-base font-semibold text-[var(--foreground)] sm:text-lg">
+        {t("flow.title")}
+      </h3>
+      <p className="mb-4 text-sm text-[var(--muted)] sm:mb-6">{t("flow.subtitle")}</p>
 
-      <div className="flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between">
+      <ol className="flex list-none flex-col gap-4 p-0 md:flex-row md:items-center md:justify-between md:gap-2">
         {stepConfig.map((step, i) => (
-          <div
+          <li
             key={step.titleKey}
-            className={`relative flex flex-1 flex-col items-center text-center ${
+            className={`flex items-start gap-4 md:flex-1 md:flex-col md:items-center md:text-center ${
               i < stepConfig.length - 1 ? "flow-arrow md:pr-6" : ""
             }`}
           >
             <div
-              className={`mb-3 flex h-14 w-14 items-center justify-center rounded-2xl ${step.color} shadow-sm transition-transform hover:scale-110`}
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-sm md:mb-3 md:h-14 md:w-14 ${step.color}`}
             >
-              <step.icon className="h-7 w-7" />
+              <step.icon className="h-6 w-6 md:h-7 md:w-7" />
             </div>
-            <h4 className="font-semibold text-[var(--foreground)]">{t(step.titleKey)}</h4>
-            <p className="mt-1 max-w-[140px] text-xs text-[var(--muted)]">{t(step.descKey)}</p>
-            {i < stepConfig.length - 1 && (
-              <span className="mt-2 text-[var(--primary)] md:hidden">↓</span>
-            )}
-          </div>
+            <div className="min-w-0 flex-1 pt-0.5 md:flex-none md:pt-0">
+              <h4 className="font-semibold text-[var(--foreground)]">{t(step.titleKey)}</h4>
+              <p className="mt-1 text-xs leading-relaxed text-[var(--muted)] md:max-w-[140px]">
+                {t(step.descKey)}
+              </p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ol>
 
-      <div className="mt-8 rounded-xl bg-[var(--accent)] p-4">
+      <div className="mt-6 rounded-xl bg-[var(--accent)] p-3 sm:mt-8 sm:p-4">
         <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-[var(--muted)]">
           <span className="rounded-full surface-card px-3 py-1 font-medium text-[var(--primary)]">
             {t("flow.footer.erp")}
           </span>
-          <span>→</span>
+          <span className="hidden md:inline">→</span>
           <span>{t("flow.footer.dashboard")}</span>
-          <span>→</span>
+          <span className="hidden md:inline">→</span>
           <span>{t("flow.footer.analytics")}</span>
         </div>
       </div>

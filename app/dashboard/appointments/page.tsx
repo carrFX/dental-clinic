@@ -8,6 +8,7 @@ import { FormField } from "@/components/dashboard/FormField";
 import { useData } from "@/contexts/DataContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useConfirm } from "@/contexts/ConfirmContext";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { appointmentStatusKey } from "@/lib/i18n/status-label";
 import type { Appointment } from "@/lib/types";
 
@@ -89,11 +90,7 @@ export default function AppointmentsPage() {
           {
             key: "status",
             label: t("form.status"),
-            render: (a) => (
-              <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-medium">
-                {t(appointmentStatusKey(a.status))}
-              </span>
-            ),
+            render: (a) => <StatusBadge status={a.status} type="appointment" />,
           },
         ]}
         onAdd={openAdd}
