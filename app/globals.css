@@ -1,0 +1,277 @@
+@import "tailwindcss";
+
+/* ── Light mode (default) ── */
+:root {
+  --background: #f0f7ff;
+  --foreground: #0f2942;
+  --primary: #2196f3;
+  --primary-light: #64b5f6;
+  --primary-dark: #1565c0;
+  --accent: #e3f2fd;
+  --card: #ffffff;
+  --border: #bbdefb;
+  --muted: #5c7a99;
+  --gray: #90a4ae;
+  --sidebar-bg: #ffffff;
+  --sidebar-hover: rgba(33, 150, 243, 0.08);
+  --sidebar-active-bg: linear-gradient(90deg, #2196f3, #64b5f6);
+  --overlay: rgba(15, 41, 66, 0.45);
+  --success: #4caf50;
+  --warning: #ff9800;
+  --danger: #f44336;
+  --glass: rgba(255, 255, 255, 0.88);
+  --shadow: 0 12px 32px rgba(33, 150, 243, 0.12);
+}
+
+/* ── Dark mode ── */
+.dark {
+  --background: #0a1628;
+  --foreground: #e3f2fd;
+  --primary: #64b5f6;
+  --primary-light: #90caf9;
+  --primary-dark: #42a5f5;
+  --accent: #132a4a;
+  --card: #112240;
+  --border: #1e3a5f;
+  --muted: #90a4ae;
+  --gray: #607d8b;
+  --sidebar-bg: #0d1f38;
+  --sidebar-hover: rgba(100, 181, 246, 0.12);
+  --sidebar-active-bg: linear-gradient(90deg, #1976d2, #42a5f5);
+  --overlay: rgba(0, 0, 0, 0.65);
+  --glass: rgba(17, 34, 64, 0.92);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-gray: var(--gray);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+/* Surfaces */
+.surface-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.surface-muted {
+  background: var(--accent);
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Components */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 50%, var(--primary-dark) 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(
+    160deg,
+    var(--accent) 0%,
+    var(--background) 40%,
+    color-mix(in srgb, var(--primary) 25%, var(--background)) 70%,
+    var(--background) 100%
+  );
+}
+
+.gradient-sidebar {
+  background: linear-gradient(
+    180deg,
+    var(--sidebar-bg) 0%,
+    color-mix(in srgb, var(--primary) 6%, var(--sidebar-bg)) 100%
+  );
+}
+
+.hover-lift {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.sidebar-link {
+  transition: all 0.2s ease;
+  color: var(--muted);
+}
+
+.sidebar-link:hover {
+  background: var(--sidebar-hover);
+  color: var(--foreground);
+  transform: translateX(4px);
+}
+
+.sidebar-link.active {
+  background: var(--sidebar-active-bg);
+  color: white;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.sidebar-link.active .sidebar-icon-wrap {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.sidebar-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  color: var(--primary);
+  transition: all 0.2s ease;
+}
+
+.flow-arrow {
+  position: relative;
+}
+
+.flow-arrow::after {
+  content: "→";
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .flow-arrow::after {
+    content: "↓";
+    right: auto;
+    top: auto;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Status badges — theme aware */
+.badge-success {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: var(--danger);
+}
+
+.badge-info {
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--primary);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Service cards — hanya ikon yang berubah, teks tetap terbaca */
+.service-icon-wrap {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.group:hover .service-icon-wrap {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 35%, transparent);
+}

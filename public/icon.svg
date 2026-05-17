@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Arcade Dental">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#42a5f5"/>
+      <stop offset="100%" style="stop-color:#1565c0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <path fill="#fff" d="M256 120c-48 0-88 36-88 84 0 28 14 52 36 68-8 24-4 52 20 68 12 8 26 12 32 12s20-4 32-12c24-16 28-44 20-68 22-16 36-40 36-68 0-48-40-84-88-84zm0 32c8 0 14 10 14 22s-6 22-14 22-14-10-14-22 6-22 14-22zm-52 88c20-16 84-16 104 0-6 14-2 30 8 40-14 8-32 8-46 0 10-10 14-26 8-40z"/>
+</svg>
